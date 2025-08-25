@@ -47,7 +47,7 @@ void main() {
       var num1 = double.tryParse(partes[0].trim());
       var num2 = double.tryParse(partes[1].trim());
       if (num1 != null && num2 != null) {
-        if (num2 == 0 || num1 == 0) {
+        if (num2 == 0) {
           print("Erro: divisão por zero!");
         } else {
           print("Resultado: ${num1 / num2}");
