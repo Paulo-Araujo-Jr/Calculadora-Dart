@@ -1,62 +1,43 @@
 import 'dart:io';
+import 'package:expressions/expressions.dart';
 
 void main() {
-  print("+ / Calculadora - *  ");
-  print("Digite expressões (ex: 1+1, 2*3, 5/2, 7-4).");
+  print("+ - Calculadora / *  ");
+  print("Digite expressões (ex: 1+1, 2*3, 5/2, 7-4, 2+2/2).");
   print("Digite 's' para sair.");
 
   while (true) {
-    print(">> ");
+    stdout.write(">> ");
     String? input = stdin.readLineSync();
 
-    if (input == null) continue;
+    if (input == null || input.trim().isEmpty) {
+      continue;
+    }
+
     if (input.toLowerCase() == 's') {
       print("Encerrando calculadora...");
       break;
     }
 
-    if (input.contains('+')) {
-      var partes = input.split('+');
-      var num1 = double.tryParse(partes[0].trim());
-      var num2 = double.tryParse(partes[1].trim());
-      if (num1 != null && num2 != null) {
-        print("Resultado: ${num1 + num2}");
-      } else {
-        print("Entrada inválida!");
+    try {
+      final expression = Expression.parse(input);
+      final evaluator = const ExpressionEvaluator();
+      final result = evaluator.eval(expression, {});
+
+      if (result == null) {
+        print("Expressão inválida!");
+        continue;
       }
-    } else if (input.contains('-')) {
-      var partes = input.split('-');
-      var num1 = double.tryParse(partes[0].trim());
-      var num2 = double.tryParse(partes[1].trim());
-      if (num1 != null && num2 != null) {
-        print("Resultado: ${num1 - num2}");
+
+      if (result is num && (result.isInfinite || result.isNaN)) {
+        print("Erro: divisão por zero!");
+      } else if (result is num && result % 1 == 0) {
+        print("Resultado: ${result.toInt()}");
       } else {
-        print("Entrada inválida!");
+        print("Resultado: $result");
       }
-    } else if (input.contains('*')) {
-      var partes = input.split('*');
-      var num1 = double.tryParse(partes[0].trim());
-      var num2 = double.tryParse(partes[1].trim());
-      if (num1 != null && num2 != null) {
-        print("Resultado: ${num1 * num2}");
-      } else {
-        print("Entrada inválida!");
-      }
-    } else if (input.contains('/')) {
-      var partes = input.split('/');
-      var num1 = double.tryParse(partes[0].trim());
-      var num2 = double.tryParse(partes[1].trim());
-      if (num1 != null && num2 != null) {
-        if (num2 == 0) {
-          print("Erro: divisão por zero!");
-        } else {
-          print("Resultado: ${num1 / num2}");
-        }
-      } else {
-        print("Entrada inválida!");
-      }
-    } else {
-      print("Expressão não reconhecida! Use +, -, * ou /.");
+    } catch (e) {
+      print("Erro ao avaliar expressão!");
     }
   }
 }
